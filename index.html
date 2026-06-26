@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>División entre dos cifras</title>
+    <link rel="icon" type="image/x-icon" href="https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/icono.ico">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --blue-dark:#04032B; --blue-700:#1a3a5f; --blue-600:#254fba;
+            --orange:#f59e42; --bg1:#1a3a5f; --bg2:#0d2340;
+            --white:#fff; --green:#2ecc71; --red:#e74c3c; --panel:#E8EAFF;
+            --success:#10b981; --danger:#ef4444;
+            --text-light:#6b7280; --shadow:0 12px 24px rgba(0,0,0,.12); --tr:180ms ease;
+        }
+        body { font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; background:linear-gradient(135deg,var(--bg1) 0%,var(--bg2) 100%); min-height:100vh; display:flex; justify-content:center; align-items:flex-start; padding:24px 20px; }
+        .game-container { background:var(--white); border-radius:20px; box-shadow:0 16px 40px rgba(0,0,0,.18); padding:1.6rem; max-width:980px; width:100%; position:relative; display:flex; flex-direction:column; }
+        .screen { display:none; animation:fadeIn .4s ease; flex-direction:column; flex:1; width:100%; }
+        .screen.active { display:flex; }
+        @keyframes fadeIn { from{opacity:0;transform:translateY(15px)} to{opacity:1;transform:translateY(0)} }
+        h1 { color:var(--blue-dark); font-size:clamp(1.5rem,5vw,2.4rem); font-weight:900; text-align:center; margin-bottom:.4rem; }
+        h2 { color:var(--blue-dark); font-size:1.3rem; font-weight:700; margin-bottom:10px; }
+        .subtitle { color:var(--blue-700); font-size:clamp(.9rem,2.5vw,1.15rem); font-weight:600; text-align:center; margin-bottom:.8rem; }
+        /* Botones flotantes */
+        .mute-btn { position:absolute;top:1rem;right:1rem;background:linear-gradient(135deg,var(--orange),#e67e22);color:#fff;border:2px solid #fff;width:42px;height:42px;border-radius:50%;cursor:pointer;font-size:1.2rem;display:flex;align-items:center;justify-content:center;z-index:100; }
+        .mute-btn:hover { transform:scale(1.12) rotate(8deg);box-shadow:0 6px 16px rgba(245,158,66,.45); }
+        .fixed-tables-btn,.fixed-help-btn { position:absolute;top:1rem;width:42px;height:42px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--blue-700),var(--blue-600));border:2px solid #fff;border-radius:50%;color:#fff;cursor:pointer;font-size:18px;z-index:100;box-shadow:0 4px 12px rgba(37,79,186,.3);transition:transform .2s ease,box-shadow .2s ease; }
+        .fixed-tables-btn { left:1rem; } .fixed-help-btn { left:4rem; }
+        .fixed-tables-btn:hover,.fixed-help-btn:hover { transform:scale(1.12);box-shadow:0 6px 16px rgba(37,79,186,.45); }
+        .mute-btn { box-shadow:0 4px 12px rgba(245,158,66,.3);transition:transform .2s ease,box-shadow .2s ease; }
+        /* Botones */
+        .btn { color:#fff;border:none;border-radius:14px;cursor:pointer;font-weight:800;transition:transform .15s ease,box-shadow .25s ease,filter .2s ease;display:inline-flex;align-items:center;justify-content:center;font-size:1.1rem;font-family:inherit;box-shadow:0 4px 12px rgba(0,0,0,.12);letter-spacing:.3px; }
+        .btn:hover { transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,.2);filter:brightness(1.05); }
+        .btn:active { transform:translateY(-1px);box-shadow:0 3px 8px rgba(0,0,0,.15); }
+        .btn-start   { background:linear-gradient(135deg,var(--orange),#e8852a);margin:.5rem auto;padding:.7rem 2rem;height:52px;font-size:1.12rem;min-width:170px; }
+        .btn-primary { background:linear-gradient(135deg,var(--blue-600),#1d3f96);padding:.7rem 1.4rem;height:48px;font-size:1rem; }
+        .btn-success { background:linear-gradient(135deg,var(--green),#27ae60);padding:.7rem 1.4rem;height:48px;font-size:1rem; }
+        .btn-danger  { background:linear-gradient(135deg,var(--red),#c0392b);padding:.7rem 1.4rem;height:48px;font-size:1rem; }
+        .btn-group   { display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:14px; }
+        /* Inicio */
+        .start-content { display:flex;flex-direction:column;align-items:center;flex:1;padding:1rem .5rem;text-align:center; }
+        .advice-box { background:var(--panel);border-left:5px solid var(--orange);padding:1.5rem 1.6rem;border-radius:14px;color:var(--blue-700);max-width:680px;font-size:1.08rem;line-height:1.7;margin-bottom:1.6rem;text-align:center;box-shadow:0 6px 18px rgba(37,79,186,.1); }
+        .advice-box .key { color:var(--orange);font-weight:800; }
+        .advice-anim-text { display:block;text-align:center;font-weight:900;margin-top:1.1rem;font-size:1.4rem;color:var(--orange); }
+        .start-image-container { width:100%;display:flex;justify-content:center;margin-top:auto;padding-top:.5rem; }
+        .start-image { max-width:340px;width:100%;height:auto; }
+        /* Cabecera juego */
+        .game-header { margin-bottom:8px;display:flex;flex-direction:column;align-items:center;width:100%; }
+        .guide-text  { color:var(--blue-dark);font-weight:700;font-size:.98em;text-align:center;min-height:1.5em; }
+        .progress-bar { height:8px;background:#e6f2ff;border-radius:999px;overflow:hidden;width:100%;border:1px solid #d3e2ff;margin-bottom:6px; }
+        .progress-fill { height:100%;background:var(--orange);border-radius:999px;transition:width .3s; }
+        .progress-text { text-align:right;font-size:13px;color:var(--text-light);margin-bottom:4px;width:100%; }
+        /* Grid división */
+        .division-wrapper { display:grid;align-items:start;justify-content:center;margin:10px auto;position:relative;width:fit-content;font-family:'Courier New',monospace;font-size:1.5rem; }
+        .digit-box,.answer-box { width:2.6rem;height:2.6rem;display:flex;align-items:center;justify-content:center;font-weight:bold; }
+        .answer-box { border:2px solid #d1d5db;border-radius:.4rem;background:#f9fafb;transition:all .25s; }
+        .answer-box.current   { border-color:#a855f7;background:#faf5ff;transform:scale(1.08); }
+        .answer-box.correct   { border-color:var(--success);background:rgba(16,185,129,.18);color:var(--success); }
+        .answer-box.incorrect { border-color:var(--danger);background:rgba(239,68,68,.18);color:var(--danger);animation:shake .45s ease; }
+        .digit-box.resto-col  { color:var(--success);font-weight:bold; }
+        @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 75%{transform:translateX(5px)} }
+        /* Banco */
+        .digit-bank { display:flex;justify-content:center;flex-wrap:nowrap;gap:8px;margin:10px auto;width:100%;max-width:600px; }
+        .digit-btn { flex:1;min-width:0;height:54px;display:flex;align-items:center;justify-content:center;background:var(--white);border:2px solid #e5e9f0;border-radius:14px;font-size:24px;font-weight:700;cursor:pointer;transition:all var(--tr);font-family:inherit;color:var(--blue-700);box-shadow:0 2px 6px rgba(0,0,0,.06); }
+        .digit-btn:hover { background:linear-gradient(135deg,var(--blue-600),#1d3f96);color:#fff;border-color:var(--blue-600);transform:translateY(-3px);box-shadow:0 6px 14px rgba(37,79,186,.3); }
+        .digit-btn:active { transform:translateY(-1px); }
+        @media (max-width:560px) {
+            .digit-bank { flex-wrap:wrap;max-width:100%;gap:6px; }
+            .digit-btn  { flex:0 0 calc(20% - 6px);height:52px;font-size:22px; }
+            .division-wrapper { font-size:1.2rem; }
+            .digit-box,.answer-box { width:2.2rem;height:2.2rem; }
+        }
+        /* Popup */
+        .question-popup { margin:8px auto;background:white;border-radius:14px;padding:14px 18px;box-shadow:0 8px 20px rgba(0,0,0,.18);text-align:center;max-width:95%;width:fit-content; }
+        .question-popup h3 { margin-bottom:10px;color:var(--blue-dark);font-size:.98em; }
+        #divisionArea  { display:flex;justify-content:center;min-height:220px;align-items:flex-start; }
+        #interactZone  { min-height:100px; }
+        /* Feedback */
+        .feedback { margin:8px 0;padding:12px;border-radius:12px;font-size:.95em;font-weight:700;text-align:center;width:100%;display:none; }
+        .feedback.show    { display:block;animation:fadeIn .3s ease; }
+        .feedback.success { background:rgba(46,204,113,.15);border:3px solid var(--green);color:#1a8a4a; }
+        .feedback.error   { background:rgba(231,76,60,.15);border:3px solid var(--red);color:var(--red); }
+        /* Modal */
+        .modal { position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:1000; }
+        .modal.active { display:flex;animation:fadeIn .3s ease; }
+        .modal-content { background:var(--white);border-radius:16px;padding:22px;max-width:90%;width:380px;max-height:85vh;overflow-y:auto; }
+        .modal-header { display:flex;justify-content:space-between;align-items:center;margin-bottom:14px; }
+        .modal-close { background:none;border:none;font-size:22px;cursor:pointer;color:var(--text-light); }
+        .modal-content p { margin-bottom:9px;color:#334155;font-size:.93em; }
+        .modal-content p strong { color:var(--blue-dark); }
+        .highlight-note { color:var(--orange);font-weight:700;text-align:center;margin-top:12px !important; }
+        .tables-content p { font-family:'Courier New',monospace;font-size:.95em; }
+        /* Manual */
+        .input-group { margin-bottom:16px; }
+        .input-group label { display:block;margin-bottom:6px;font-weight:700;color:var(--blue-dark);font-size:.95rem; }
+        .input-group input { width:100%;padding:10px;border:2px solid #e0e0e0;border-radius:10px;font-size:1em;font-family:inherit;text-align:center; }
+        .input-group input:focus { outline:none;border-color:var(--blue-600); }
+        .manual-error { color:var(--red);font-weight:700;margin-bottom:8px;text-align:center;min-height:1.3em;font-size:.9rem; }
+        /* Final */
+        .results { display:flex;flex-direction:column;align-items:center;gap:.8rem;text-align:center;flex:1;justify-content:center;padding:1rem; }
+        #trophyEl  { display:none;font-size:5rem;animation:bounce 1s ease infinite; }
+        @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-18px)} }
+        .big-score     { font-size:clamp(3rem,8vw,4.5rem);color:var(--blue-600);font-weight:900; }
+        .score-title   { font-size:1.4rem;color:var(--blue-700);font-weight:700; }
+        .final-time    { font-size:1.2rem;color:var(--blue-700);font-weight:600; }
+        .final-message { font-size:clamp(1rem,3vw,1.4rem);font-weight:800;color:var(--blue-700); }
+        .credit        { font-weight:700;color:#555;font-size:.88rem; }
+        .school-logo   { width:160px; }
+        .confetti { position:fixed;width:10px;height:10px;border-radius:50%;animation:cfall 3s linear forwards;z-index:999;pointer-events:none; }
+        @keyframes cfall { 0%{transform:translate(0,-10px) rotate(0);opacity:1} 100%{transform:translate(var(--tx),var(--ty)) rotate(360deg);opacity:0} }
+    </style>
+</head>
+<body>
+<div class="game-container">
+
+<!-- ══ INICIO ══ -->
+<div id="screenStart" class="screen active">
+    <header>
+        <h1>División entre dos cifras</h1>
+        <div class="subtitle">Aprende a dividir entre un número de dos cifras</div>
+    </header>
+    <div class="start-content">
+        <div class="advice-box">
+            Usa esta herramienta para aprender a dividir entre un número de dos cifras. Recuerda los pasos:
+            <span class="key">coger cifras</span>, <span class="key">tapar y buscar</span>, <span class="key">multiplicar hasta llegar</span> y <span class="key">bajar</span> la siguiente cifra. Si necesitas ayuda, pulsa el botón <strong>❓</strong> durante el juego.
+            <div class="advice-anim-text">¡Ánimo!</div>
+        </div>
+        <div class="btn-group">
+            <button class="btn btn-start" onclick="startGame(false)">Comenzar</button>
+            <button class="btn btn-start" style="background:var(--blue-600);" onclick="showManualSetup()">Manual</button>
+        </div>
+        <div class="start-image-container">
+            <img class="start-image"
+                 src="https://raw.githubusercontent.com/ManuelVS8/Efectos_audio/refs/heads/main/Ni%C3%B1os.png"
+                 alt="Niños estudiando">
+        </div>
+    </div>
+</div>
+
+<!-- ══ MANUAL ══ -->
+<div id="screenManual" class="screen">
+    <header><h1>Modo Manual</h1></header>
+    <div class="start-content">
+        <div class="input-group" style="width:100%;max-width:400px;">
+            <label for="inpDividend">Dividendo (100 – 99999)</label>
+            <input type="number" id="inpDividend" placeholder="Ej: 2436">
+        </div>
+        <div class="input-group" style="width:100%;max-width:400px;">
+            <label for="inpDivisor">Divisor (dos cifras, 11–99, no termina en 0)</label>
+            <input type="number" id="inpDivisor" placeholder="Ej: 52">
+        </div>
+        <div class="manual-error" id="manualError"></div>
+        <div class="btn-group">
+            <button class="btn btn-start" style="background:var(--green);" onclick="startManual()">Empezar</button>
+            <button class="btn btn-start" style="background:var(--blue-600);" onclick="showScreen('screenStart')">Atrás</button>
+        </div>
+    </div>
+</div>
+
+<!-- ══ JUEGO ══ -->
+<div id="screenGame" class="screen">
+    <button class="mute-btn"         id="btnSound"      onclick="toggleSound()">🔊</button>
+    <button class="fixed-tables-btn" onclick="openModal('modalTable')">📊</button>
+    <button class="fixed-help-btn"   onclick="openModal('modalHelp')">❓</button>
+    <header style="margin-top:2.8rem;"><h1>División entre dos cifras</h1></header>
+    <div class="game-header">
+        <div class="progress-text" id="progressText" style="display:none"></div>
+        <div class="progress-bar"  id="progressBar"  style="display:none">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="guide-text" id="guideText"></div>
+    </div>
+    <div id="divisionArea"></div>
+    <div id="interactZone">
+        <div id="questionPopup" class="question-popup" style="display:none">
+            <h3 id="questionText"></h3>
+            <div class="digit-bank" id="questionOptions"></div>
+        </div>
+        <div class="digit-bank" id="digitBank"></div>
+    </div>
+    <div id="actionBtns"></div>
+    <div class="feedback" id="feedbackBox"></div>
+</div>
+
+<!-- ══ FINAL ══ -->
+<div id="screenFinal" class="screen">
+    <header><h1>División entre dos cifras</h1></header>
+    <div class="results">
+        <div id="trophyEl">🏆</div>
+        <div class="score-title">Puntuación:</div>
+        <div class="big-score"    id="finalScoreEl">0</div>
+        <div class="final-time">Tiempo: <span id="finalTimeEl">00:00</span></div>
+        <div class="final-message" id="finalMsgEl"></div>
+        <div class="btn-group">
+            <button class="btn btn-start" onclick="showScreen('screenStart')">Volver al menú</button>
+            <button class="btn btn-start" style="background:var(--blue-600);" onclick="startGame(true)">Entrenamiento infinito</button>
+        </div>
+        <div class="credit">Creado por Manuel J. Ventura</div>
+        <img class="school-logo"
+             src="https://raw.githubusercontent.com/ManuelVS8/Efectos_audio/refs/heads/main/Siurot.png"
+             alt="Logo del colegio">
+    </div>
+</div>
+</div><!-- /game-container -->
+
+<!-- ══ MODALS ══ -->
+<div id="modalHelp" class="modal" onclick="closeModalOnBg(event,'modalHelp')">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h2>Pasos para dividir entre dos cifras</h2>
+            <button class="modal-close" onclick="closeModal('modalHelp')">&times;</button>
+        </div>
+        <p><strong>Paso 0. ¿Cuántas cogemos?</strong><br>
+        Cogemos 2 o 3 cifras del dividendo para obtener un número que sea igual o mayor que el divisor.</p>
+        <p><strong>Paso 1. Tapar y buscar.</strong><br>
+        Como no nos sabemos las tablas de números de dos cifras, tapamos la última cifra del divisor <em>y</em> la última cifra de las que hemos cogido. Con lo que queda, buscamos en la tabla de esa primera cifra un número que se acerque sin pasarse.</p>
+        <p><strong>Paso 2. Multiplicar hasta llegar.</strong><br>
+        Multiplicamos el número del cociente por el divisor y lo restamos al dividendo; primero las <em>unidades</em> y luego las <em>decenas</em>. En cada caso calculamos mentalmente hasta cuánto llega y anotamos la llevada.</p>
+        <p><strong>Paso 3. Bajar.</strong><br>
+        Bajamos la siguiente cifra del dividendo para seguir dividiendo. Luego repetimos los pasos 1, 2 y 3 hasta terminar la división.</p>
+        <p class="highlight-note">Recuerda: cero al cociente → se baja la siguiente cifra sin multiplicar.</p>
+    </div>
+</div>
+
+<div id="modalTable" class="modal" onclick="closeModalOnBg(event,'modalTable')">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h2 id="tableTitle">Tablas del divisor</h2>
+            <button class="modal-close" onclick="closeModal('modalTable')">&times;</button>
+        </div>
+        <div id="tableContent"></div>
+    </div>
+</div>
+
+<script>
+'use strict';
+
+// ─── AUDIO ───
+const SND = {
+    tap:       'https://raw.githubusercontent.com/ManuelVS8/Efectos_audio/37b3eb2da9c15c04dfb71dfe1be60f088ea3cdfc/Tap.mp3',
+    correct:   'https://raw.githubusercontent.com/ManuelVS8/Efectos_audio/7b86808e254100aeaba6285b3e0b82650ae78055/Correcto.mp3',
+    error:     'https://raw.githubusercontent.com/ManuelVS8/Efectos_audio/7b86808e254100aeaba6285b3e0b82650ae78055/Error.mp3',
+    victory:   'https://raw.githubusercontent.com/ManuelVS8/Efectos_audio/7b86808e254100aeaba6285b3e0b82650ae78055/Termin%C3%A9.mp3',
+    completed: 'https://raw.githubusercontent.com/ManuelVS8/Efectos_audio/7b86808e254100aeaba6285b3e0b82650ae78055/Completado.mp3',
+};
+let soundEnabled = true;
+const ac = {};
+function playSound(k) {
+    if(!soundEnabled) return;
+    try { if(!ac[k]){ac[k]=new Audio(SND[k]);ac[k].volume=0.7;} ac[k].currentTime=0;ac[k].play().catch(()=>{}); } catch(_){}
+}
+function toggleSound(){ soundEnabled=!soundEnabled; document.getElementById('btnSound').textContent=soundEnabled?'🔊':'🔇'; }
+
+// ─── NAVEGACIÓN ───
+function showScreen(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+function openModal(id) { document.getElementById(id).classList.add('active'); }
+function closeModal(id){ document.getElementById(id).classList.remove('active'); }
+function closeModalOnBg(e,id){ if(e.target===document.getElementById(id)) closeModal(id); }
+
+// ─── CÁLCULO DE PASOS ───
+/*
+  Para cada parcial calcula:
+  - cociente: dígito del cociente (0-9)
+  - restoUnidades: dígito de las unidades del resto parcial
+      = (unidades_del_parcial - (cociente * divisorUnidades) % 10 + 10) % 10
+  - carryUnidades: llevada a decenas
+      = floor((cociente * divisorUnidades + restoUnidades) / 10)  [simplificado]
+  - restoDecenas: dígito de las decenas del resto parcial
+      = (decenas_del_parcial - (cociente * divisorDecenas + carry) % 10 + 10) % 10
+    (y así sucesivamente para cifras superiores)
+  - restoTotal: partial - cociente * divisor  (verificación)
+  - nextDigit: siguiente cifra del dividendo a bajar
+*/
+function calcPaso(partial, divisor) {
+    const dStr = divisor.toString();
+    const dU   = parseInt(dStr[1]); // unidades del divisor
+    const dD   = parseInt(dStr[0]); // decenas del divisor
+    const pStr = partial.toString();
+
+    // Cociente real
+    const coc = Math.floor(partial / divisor);
+    const restoTotal = partial - coc * divisor;
+
+    // Caso especial: cociente 0 → no hay multiplicación, solo bajar
+    if (coc === 0) {
+        return { partial, partialStr: pStr, cociente: 0, isZero: true, faltaU: null, faltaD: null, restoTotal, nextDigit: null };
+    }
+
+    // Multiplicar hasta llegar — unidades
+    // coc × dU: calculamos cuánto llega en las unidades del parcial
+    // La operación real: (pU - (coc*dU) mod 10 + 10) mod 10
+    const prodU  = coc * dU;
+    const pU     = partial % 10;
+    const faltaU = ((pU - (prodU % 10)) + 10) % 10;
+    // Llevada: lo que "se lleva" a decenas
+    // prodU + faltaU = pU (en unidades), las decenas que sobran son la llevada
+    const carryU = Math.floor((prodU + faltaU) / 10);
+
+    // Multiplicar hasta llegar — decenas
+    const prodD  = coc * dD + carryU;
+    const pD     = Math.floor(partial / 10) % 10;
+    const faltaD = ((pD - (prodD % 10)) + 10) % 10;
+
+    return { partial, partialStr: pStr, cociente: coc, isZero: false, faltaU, faltaD, restoTotal, nextDigit: null };
+}
+
+function calcAllSteps(dividendStr, divisor) {
+    const digits = dividendStr.split('').map(Number);
+    const steps  = [];
+    let pos = 0, partial = 0;
+
+    // Tomar cifras iniciales hasta partial >= divisor
+    while (pos < digits.length) {
+        partial = partial * 10 + digits[pos]; pos++;
+        if (partial >= divisor) break;
+    }
+
+    while (true) {
+        const paso     = calcPaso(partial, divisor);
+        const nextDigit = pos < digits.length ? digits[pos] : null;
+        paso.nextDigit  = nextDigit;
+        steps.push(paso);
+        if (nextDigit === null) break;
+        // El siguiente parcial = restoTotal × 10 + cifra bajada
+        partial = paso.restoTotal * 10 + nextDigit;
+        pos++;
+        // Si el nuevo parcial < divisor, el cociente será 0 en el siguiente paso
+        // Eso ya lo maneja calcPaso con isZero:true
+    }
+    return steps;
+}
+
+function calcMinInt(steps) {
+    return 1 + steps.reduce((s, p) => {
+        // cociente siempre (1)
+        // si no es cero: restoU(1) + restoD(1)
+        // bajar si hay nextDigit (1)
+        return s + 1 + (p.isZero ? 0 : 2) + (p.nextDigit !== null ? 1 : 0);
+    }, 0);
+}
+
+function generateRandom() {
+    let divisor, dividend;
+    do {
+        divisor  = Math.floor(Math.random()*78)+12;  // 12-89
+        const q  = Math.floor(Math.random()*89)+10;  // cociente 10-98
+        const r  = Math.floor(Math.random()*divisor);
+        dividend = (q*divisor+r).toString();
+    } while (divisor%10===0 || dividend.length<3);
+    return { dividend, divisor };
+}
+
+// ─── ESTADO ───
+let G = {};
+
+function startGame(isInfinite) {
+    playSound('tap');
+    const { dividend, divisor } = generateRandom();
+    initGame(dividend, divisor, isInfinite, false, 3);
+}
+
+function showManualSetup() {
+    playSound('tap');
+    document.getElementById('inpDividend').value='';
+    document.getElementById('inpDivisor').value='';
+    document.getElementById('manualError').textContent='';
+    showScreen('screenManual');
+}
+
+function startManual() {
+    playSound('tap');
+    const dStr=document.getElementById('inpDividend').value.trim();
+    const dsStr=document.getElementById('inpDivisor').value.trim();
+    const d=parseInt(dStr), ds=parseInt(dsStr);
+    const err=document.getElementById('manualError');
+    if(isNaN(d)||d<100||d>99999){ err.textContent='El dividendo debe estar entre 100 y 99999.'; playSound('error'); return; }
+    if(isNaN(ds)||ds<11||ds>99) { err.textContent='El divisor debe ser de dos cifras (11-99).'; playSound('error'); return; }
+    if(ds%10===0)                { err.textContent='El divisor no puede terminar en 0.'; playSound('error'); return; }
+    if(d<=ds)                    { err.textContent='El dividendo debe ser mayor que el divisor.'; playSound('error'); return; }
+    initGame(dStr, ds, false, true, 1);
+}
+
+function initGame(dividend, divisor, isInfinite, isManual, totalQ) {
+    const steps  = calcAllSteps(dividend, divisor);
+    const minInt = calcMinInt(steps);
+    G = {
+        dividend, divisor, steps,
+        isInfinite, isManual,
+        questionIndex:0, totalQuestions:totalQ,
+        startTime: Date.now(),
+        globalMinInt:minInt, globalUserInt:0,
+        // Fases: select_digits → cociente → restoU → restoD → bring_down → siguiente o finished
+        phase: 'select_digits',
+        stepIdx: 0,
+        arcTaken: 0,
+        cocienteHistory: [],
+        restoUConfirmed: [],
+        feedback: null,
+    };
+    buildTableModal();
+    showScreen('screenGame');
+    renderGame();
+}
+
+// ─── RENDER ───
+function renderGame() {
+    renderProgress();
+    renderGuide();
+    renderGrid();
+    renderInteract();
+    renderFeedback();
+}
+
+function renderProgress() {
+    const pt=document.getElementById('progressText'), pb=document.getElementById('progressBar');
+    if(!G.isInfinite&&!G.isManual&&G.totalQuestions>1) {
+        pt.style.display='block'; pb.style.display='block';
+        pt.textContent=`${G.questionIndex+1}/${G.totalQuestions}`;
+        document.getElementById('progressFill').style.width=`${((G.questionIndex+1)/G.totalQuestions)*100}%`;
+    } else { pt.style.display='none'; pb.style.display='none'; }
+}
+
+function renderGuide() {
+    const paso = G.steps[G.stepIdx]||{};
+    const coc  = paso.cociente;
+    const dStr = G.divisor.toString();
+    const dU   = dStr[1];
+    const dD   = dStr[0];
+    const guides = {
+        select_digits: '0. ¿Cuántas cifras del dividendo cogemos?',
+        cociente:      '1. Tapa la última del divisor y la última del parcial. ¿Cuántas veces cabe?',
+        restoU:        `2a. ${coc} × ${dU} → réstalo a las últimas cifras del parcial. ¿Qué dígito sale?`,
+        restoD:        `2b. ${coc} × ${dD} + llevada → réstalo al resto visible. ¿Qué dígito sale?`,
+        bring_down:    paso.isZero ? 'Cero al cociente. Baja la siguiente cifra del dividendo.' : '3. Baja la siguiente cifra del dividendo.',
+        finished:      '¡División completada! Comprueba el resultado.',
+    };
+    document.getElementById('guideText').textContent = guides[G.phase]||'';
+}
+
+// ─── GRID ───
+function renderGrid() {
+    const area = document.getElementById('divisionArea');
+    area.innerHTML = '';
+    const ddo   = G.dividend;
+    const dsr   = G.divisor.toString();
+    const steps = G.steps;
+    const qLen  = steps.length;
+
+    // Layout de columnas:
+    // [1..ddo.length] = dividendo
+    // [ddo.length+1]  = línea vertical
+    // [ddo.length+2]  = primera cifra del divisor (decenas)
+    // [ddo.length+3]  = segunda cifra del divisor (unidades)
+    // [ddo.length+2 .. ddo.length+2+qLen-1] = cajas del cociente (empieza bajo divisor)
+    // Total: dividendo + vline + divisor(2) + cociente extra (qLen-2 si qLen>2)
+    const extraCociente = Math.max(0, qLen - 2);
+    const totalCols = ddo.length + 1 + 2 + extraCociente;
+
+    const wrap = document.createElement('div');
+    wrap.className='division-wrapper';
+    wrap.style.gridTemplateColumns=`repeat(${totalCols}, 1fr)`;
+    area.appendChild(wrap);
+
+    const add = (cls, row, col, text, style) => {
+        const d=document.createElement('div');
+        d.className=cls; d.style.gridRow=row; d.style.gridColumn=col;
+        if(text!==undefined&&text!==null) d.textContent=text;
+        if(style) Object.assign(d.style,style);
+        wrap.appendChild(d); return d;
+    };
+
+    // 1. Dividendo — fila 1
+    for(let i=0;i<ddo.length;i++) add('digit-box',1,i+1,ddo[i]);
+
+    // 2. Línea vertical — fila 1
+    add('',1,ddo.length+1,'',{borderLeft:'3px solid #1f2937',height:'100%',display:'block'});
+
+    // 3. Divisor — fila 1, columnas ddo+2 y ddo+3
+    add('digit-box',1,ddo.length+2,dsr[0]);
+    add('digit-box',1,ddo.length+3,dsr[1]);
+
+    // 4. Línea horizontal — fila 2, desde vline hasta fin
+    add('',2,`${ddo.length+1} / span ${1+2+extraCociente}`,'',{borderTop:'3px solid #1f2937',height:'0',display:'block'});
+
+    // 5. Cajas cociente — fila 3, empezando bajo divisor (col ddo+2)
+    steps.forEach((paso, idx) => {
+        const col = ddo.length + 2 + idx;
+        const hasH = G.cocienteHistory[idx]!==undefined;
+        const isCur= idx===G.stepIdx && G.phase==='cociente';
+        let cls='answer-box', content='';
+        if(hasH)       { cls+=' correct'; content=G.cocienteHistory[idx].toString(); }
+        else if(isCur) { cls+=' current'; }
+        add(cls, 3, col, content);
+    });
+
+    // 6. Arco — aparece DESPUÉS de confirmar cuántas cifras, y se queda fijo
+    if(G.arcTaken > 0) {
+        const ah=document.createElement('div');
+        ah.style.cssText=`grid-row:1;grid-column:1 / span ${G.arcTaken};position:relative;height:0;`;
+        const arc=document.createElement('div');
+        arc.style.cssText='position:absolute;top:-10px;left:0;width:100%;height:14px;border:3px solid var(--red);border-bottom:none;border-radius:100% 100% 0 0;';
+        ah.appendChild(arc); wrap.appendChild(ah);
+    }
+
+    // 7. Filas de restos (modelo del cuaderno escolar).
+    // El parcial del paso i vive en una fila. Cociente >=1 baja una fila; cociente 0 no.
+    const arcTaken = G.arcTaken || steps[0].partialStr.length;
+
+    const filaParcial = [];
+    filaParcial[0] = 1;
+    if(steps.length > 1) filaParcial[1] = 3;
+    for(let i=2;i<steps.length;i++) filaParcial[i] = filaParcial[i-1] + (steps[i-1].isZero ? 0 : 1);
+
+    for(let i=0;i<=G.stepIdx;i++) {
+        const paso   = steps[i];
+        const isCur  = i===G.stepIdx;
+        const endCol = arcTaken + i;
+
+        const restoRow = (i+1 < steps.length) ? filaParcial[i+1] : filaParcial[i] + 1;
+
+        const showFull = i<G.stepIdx || (isCur&&(G.phase==='bring_down'||G.phase==='finished'));
+        const showU    = isCur && G.phase==='restoD' && G.restoUConfirmed && G.restoUConfirmed[i]!==undefined;
+
+        if(showFull) {
+            // Cociente 0: NO se escribe resto, solo baja la cifra (se pega al parcial)
+            if(!paso.isZero) {
+                const restoStr = paso.faltaD.toString() + paso.faltaU.toString();
+                const startCol = endCol - restoStr.length + 1;
+                for(let k=0;k<restoStr.length;k++) {
+                    add('digit-box resto-col', restoRow, startCol+k, restoStr[k]);
+                }
+            }
+            // Cifra bajada en la fila del parcial siguiente
+            if(paso.nextDigit!==null && (i<G.stepIdx || (isCur&&G.phase==='finished'))) {
+                const bajaRow = filaParcial[i+1] !== undefined ? filaParcial[i+1] : restoRow;
+                add('digit-box', bajaRow, endCol+1, paso.nextDigit.toString());
+            }
+        } else if(showU) {
+            // Dígito de unidades confirmado: va en la fila del resto de este paso
+            add('digit-box resto-col', restoRow, endCol, G.restoUConfirmed[i].toString());
+        }
+    }
+}
+
+// ─── INTERACCIÓN ───
+function renderInteract() {
+    const popup=document.getElementById('questionPopup');
+    const bank =document.getElementById('digitBank');
+    popup.style.display='none';
+    bank.innerHTML='';
+
+    if(G.phase==='select_digits') {
+        popup.style.display='block';
+        document.getElementById('questionText').textContent='¿Cuántas cifras cogemos del dividendo?';
+        const opts=document.getElementById('questionOptions'); opts.innerHTML='';
+        [2,3].forEach(n=>{
+            if(n>G.dividend.length) return;
+            const b=document.createElement('button'); b.className='digit-btn'; b.textContent=n;
+            b.onclick=()=>handleSelectDigits(n); opts.appendChild(b);
+        });
+        return;
+    }
+
+    if(G.phase==='finished'&&!G.feedback) {
+        const btn=document.createElement('button'); btn.className='btn btn-primary';
+        btn.style.cssText='margin:12px auto;height:50px;font-size:1.05rem;padding:0 2rem;min-width:180px;';
+        btn.textContent='Comprobar'; btn.onclick=handleCheck; bank.appendChild(btn); return;
+    }
+
+    if(G.feedback) {
+        const wrap=document.createElement('div');
+        wrap.style.cssText='display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:10px auto;';
+        if(G.isInfinite) {
+            wrap.appendChild(mkBtn('Continuar','btn-success',handleNext));
+            wrap.appendChild(mkBtn('Salir','btn-danger',()=>{playSound('tap');showScreen('screenStart');}));
+        } else if(G.isManual) {
+            wrap.appendChild(mkBtn('Nueva','btn-primary',()=>{playSound('tap');showManualSetup();}));
+            wrap.appendChild(mkBtn('Inicio','btn-success',()=>{playSound('tap');showScreen('screenStart');}));
+        } else {
+            if(G.questionIndex+1<G.totalQuestions) wrap.appendChild(mkBtn('Continuar','btn-success',handleNext));
+            else wrap.appendChild(mkBtn('Resultados','btn-success',showFinal));
+        }
+        bank.appendChild(wrap); return;
+    }
+
+    // Banco 0-9
+    for(let d=0;d<=9;d++){
+        const b=document.createElement('button'); b.className='digit-btn'; b.textContent=d;
+        b.onclick=()=>handleDigit(d); bank.appendChild(b);
+    }
+}
+
+function renderFeedback() {
+    const box=document.getElementById('feedbackBox');
+    if(!G.feedback){box.className='feedback';box.textContent='';return;}
+    box.className='feedback show '+G.feedback.type;
+    box.textContent=G.feedback.msg;
+}
+
+// ─── HANDLERS ───
+function handleSelectDigits(n) {
+    playSound('tap'); G.globalUserInt++;
+    const partial = parseInt(G.dividend.slice(0,n));
+    if(partial >= G.divisor) {
+        playSound('correct');
+        G.arcTaken = n; // fijo para toda la división
+        G.phase='cociente';
+    } else {
+        playSound('error');
+    }
+    renderGame();
+}
+
+function handleDigit(d) {
+    playSound('tap'); G.globalUserInt++;
+    const paso = G.steps[G.stepIdx];
+
+    if(G.phase==='cociente') {
+        if(d===paso.cociente) {
+            playSound('correct');
+            G.cocienteHistory[G.stepIdx]=d;
+            if(paso.isZero) {
+                // Cero al cociente: no hay multiplicación
+                if(paso.nextDigit!==null) G.phase='bring_down';
+                else                      G.phase='finished';
+            } else {
+                G.phase='restoU';
+            }
+        } else { playSound('error'); }
+
+    } else if(G.phase==='restoU') {
+        if(d===paso.faltaU) {
+            playSound('correct');
+            if(!G.restoUConfirmed) G.restoUConfirmed=[];
+            G.restoUConfirmed[G.stepIdx]=d;
+            G.phase='restoD';
+        } else { playSound('error'); }
+
+    } else if(G.phase==='restoD') {
+        // faltaD puede ser 0 — siempre se acepta el dígito correcto incluido el 0
+        if(d===paso.faltaD) {
+            playSound('correct');
+            if(paso.nextDigit!==null) G.phase='bring_down';
+            else                      G.phase='finished';
+        } else { playSound('error'); }
+
+    } else if(G.phase==='bring_down') {
+        if(d===paso.nextDigit) {
+            playSound('correct');
+            G.stepIdx++;
+            G.phase='cociente';
+        } else { playSound('error'); }
+    }
+    renderGame();
+}
+
+function handleCheck() {
+    playSound('correct');
+    const q=Math.floor(parseInt(G.dividend)/G.divisor);
+    const r=parseInt(G.dividend)%G.divisor;
+    G.feedback={msg:`✓ ${G.dividend} ÷ ${G.divisor} = ${q} (resto ${r})`, type:'success'};
+    renderGame();
+}
+
+function handleNext() {
+    playSound('tap');
+    const {dividend,divisor}=generateRandom();
+    const steps=calcAllSteps(dividend,divisor);
+    G.globalMinInt+=calcMinInt(steps);
+    G.questionIndex++;
+    Object.assign(G,{dividend,divisor,steps,phase:'select_digits',stepIdx:0,arcTaken:0,cocienteHistory:[],restoUConfirmed:[],feedback:null});
+    buildTableModal(); renderGame();
+}
+
+function showFinal() {
+    playSound('tap');
+    let score=0;
+    if(G.globalUserInt>0) score=Math.min(100,Math.floor((G.globalMinInt/G.globalUserInt)*100));
+    const e=Math.floor((Date.now()-G.startTime)/1000);
+    document.getElementById('finalScoreEl').textContent=score;
+    document.getElementById('finalTimeEl').textContent=`${String(Math.floor(e/60)).padStart(2,'0')}:${String(e%60).padStart(2,'0')}`;
+    document.getElementById('finalMsgEl').textContent=score===100?'¡Enhorabuena, puntuación máxima!':'¡Buen trabajo! Sigue practicando';
+    document.getElementById('trophyEl').style.display=score===100?'block':'none';
+    showScreen('screenFinal');
+    if(score===100){playSound('victory');launchConfetti();}else playSound('completed');
+}
+
+function mkBtn(label,cls,fn){const b=document.createElement('button');b.className='btn '+cls;b.textContent=label;b.onclick=fn;return b;}
+
+function buildTableModal() {
+    const dStr = G.divisor.toString();
+    const dD   = parseInt(dStr[0]); // decenas
+    const dU   = parseInt(dStr[1]); // unidades
+    document.getElementById('tableTitle').textContent = `Tablas del divisor ${G.divisor}`;
+    const c = document.getElementById('tableContent');
+    c.innerHTML = '';
+
+    // Dos columnas: tabla de decenas y tabla de unidades
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:16px;';
+
+    const makeTable = (digit, label) => {
+        const col = document.createElement('div');
+        const title = document.createElement('p');
+        title.style.cssText = 'font-weight:800;color:var(--blue-dark);margin-bottom:8px;text-align:center;font-size:1em;';
+        title.textContent = label;
+        col.appendChild(title);
+        for(let n=1;n<=10;n++) {
+            const p = document.createElement('p');
+            p.style.cssText = 'font-family:Courier New,monospace;font-size:.92em;margin-bottom:5px;';
+            p.textContent = `${digit} × ${n} = ${digit*n}`;
+            col.appendChild(p);
+        }
+        return col;
+    };
+
+    wrap.appendChild(makeTable(dD, `Tabla del ${dD} (decenas)`));
+    wrap.appendChild(makeTable(dU, `Tabla del ${dU} (unidades)`));
+    c.appendChild(wrap);
+}
+
+function launchConfetti() {
+    const colors=['#f59e42','#2ecc71','#254fba','#e74c3c','#d946ef'];
+    for(let i=0;i<100;i++){
+        setTimeout(()=>{
+            const c=document.createElement('div'); c.className='confetti';
+            c.style.left=Math.random()*100+'vw';
+            c.style.backgroundColor=colors[Math.floor(Math.random()*colors.length)];
+            c.style.setProperty('--tx',(Math.random()-.5)*400+'px');
+            c.style.setProperty('--ty',window.innerHeight+'px');
+            document.body.appendChild(c); setTimeout(()=>c.remove(),3100);
+        },i*30);
+    }
+}
+</script>
+</body>
+</html>
