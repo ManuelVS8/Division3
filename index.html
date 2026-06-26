@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>División entre dos cifras</title>
+    <title>División entre tres cifras</title>
     <link rel="icon" type="image/x-icon" href="https://raw.githubusercontent.com/ManuelVS8/Audios-juegos-SCIENCE/refs/heads/main/icono.ico">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -52,8 +52,8 @@
         .progress-fill { height:100%;background:var(--orange);border-radius:999px;transition:width .3s; }
         .progress-text { text-align:right;font-size:13px;color:var(--text-light);margin-bottom:4px;width:100%; }
         /* Grid división */
-        .division-wrapper { display:grid;align-items:start;justify-content:center;margin:10px auto;position:relative;width:fit-content;font-family:'Courier New',monospace;font-size:1.5rem; }
-        .digit-box,.answer-box { width:2.6rem;height:2.6rem;display:flex;align-items:center;justify-content:center;font-weight:bold; }
+        .division-wrapper { display:grid;align-items:start;justify-content:center;margin:10px auto;position:relative;width:fit-content;font-family:'Courier New',monospace;font-size:1.4rem; }
+        .digit-box,.answer-box { width:2.4rem;height:2.4rem;display:flex;align-items:center;justify-content:center;font-weight:bold; }
         .answer-box { border:2px solid #d1d5db;border-radius:.4rem;background:#f9fafb;transition:all .25s; }
         .answer-box.current   { border-color:#a855f7;background:#faf5ff;transform:scale(1.08); }
         .answer-box.correct   { border-color:var(--success);background:rgba(16,185,129,.18);color:var(--success); }
@@ -68,8 +68,8 @@
         @media (max-width:560px) {
             .digit-bank { flex-wrap:wrap;max-width:100%;gap:6px; }
             .digit-btn  { flex:0 0 calc(20% - 6px);height:52px;font-size:22px; }
-            .division-wrapper { font-size:1.2rem; }
-            .digit-box,.answer-box { width:2.2rem;height:2.2rem; }
+            .division-wrapper { font-size:1.05rem; }
+            .digit-box,.answer-box { width:1.9rem;height:1.9rem; }
         }
         /* Popup */
         .question-popup { margin:8px auto;background:white;border-radius:14px;padding:14px 18px;box-shadow:0 8px 20px rgba(0,0,0,.18);text-align:center;max-width:95%;width:fit-content; }
@@ -84,7 +84,7 @@
         /* Modal */
         .modal { position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:1000; }
         .modal.active { display:flex;animation:fadeIn .3s ease; }
-        .modal-content { background:var(--white);border-radius:16px;padding:22px;max-width:90%;width:380px;max-height:85vh;overflow-y:auto; }
+        .modal-content { background:var(--white);border-radius:16px;padding:22px;max-width:90%;width:440px;max-height:85vh;overflow-y:auto; }
         .modal-header { display:flex;justify-content:space-between;align-items:center;margin-bottom:14px; }
         .modal-close { background:none;border:none;font-size:22px;cursor:pointer;color:var(--text-light); }
         .modal-content p { margin-bottom:9px;color:#334155;font-size:.93em; }
@@ -117,13 +117,13 @@
 <!-- ══ INICIO ══ -->
 <div id="screenStart" class="screen active">
     <header>
-        <h1>División entre dos cifras</h1>
-        <div class="subtitle">Aprende a dividir entre un número de dos cifras</div>
+        <h1>División entre tres cifras</h1>
+        <div class="subtitle">Aprende a dividir entre un número de tres cifras</div>
     </header>
     <div class="start-content">
         <div class="advice-box">
-            Usa esta herramienta para aprender a dividir entre un número de dos cifras. Recuerda los pasos:
-            <span class="key">coger cifras</span>, <span class="key">tapar y buscar</span>, <span class="key">multiplicar hasta llegar</span> y <span class="key">bajar</span> la siguiente cifra. Si necesitas ayuda, pulsa el botón <strong>❓</strong> durante el juego.
+            Usa esta herramienta para aprender a dividir entre un número de tres cifras. Recuerda los pasos:
+            <span class="key">coger cifras</span>, <span class="key">tapar y buscar</span>, <span class="key">multiplicar hasta llegar</span> (unidades, decenas y centenas) y <span class="key">bajar</span> la siguiente cifra. Si necesitas ayuda, pulsa el botón <strong>❓</strong> durante el juego.
             <div class="advice-anim-text">¡Ánimo!</div>
         </div>
         <div class="btn-group">
@@ -143,12 +143,12 @@
     <header><h1>Modo Manual</h1></header>
     <div class="start-content">
         <div class="input-group" style="width:100%;max-width:400px;">
-            <label for="inpDividend">Dividendo (100 – 99999)</label>
-            <input type="number" id="inpDividend" placeholder="Ej: 2436">
+            <label for="inpDividend">Dividendo (1000 – 999999)</label>
+            <input type="number" id="inpDividend" placeholder="Ej: 24360">
         </div>
         <div class="input-group" style="width:100%;max-width:400px;">
-            <label for="inpDivisor">Divisor (dos cifras, 11–99, no termina en 0)</label>
-            <input type="number" id="inpDivisor" placeholder="Ej: 52">
+            <label for="inpDivisor">Divisor (tres cifras, decenas 1-3, sin ceros)</label>
+            <input type="number" id="inpDivisor" placeholder="Ej: 324">
         </div>
         <div class="manual-error" id="manualError"></div>
         <div class="btn-group">
@@ -163,7 +163,7 @@
     <button class="mute-btn"         id="btnSound"      onclick="toggleSound()">🔊</button>
     <button class="fixed-tables-btn" onclick="openModal('modalTable')">📊</button>
     <button class="fixed-help-btn"   onclick="openModal('modalHelp')">❓</button>
-    <header style="margin-top:2.8rem;"><h1>División entre dos cifras</h1></header>
+    <header style="margin-top:2.8rem;"><h1>División entre tres cifras</h1></header>
     <div class="game-header">
         <div class="progress-text" id="progressText" style="display:none"></div>
         <div class="progress-bar"  id="progressBar"  style="display:none">
@@ -185,7 +185,7 @@
 
 <!-- ══ FINAL ══ -->
 <div id="screenFinal" class="screen">
-    <header><h1>División entre dos cifras</h1></header>
+    <header><h1>División entre tres cifras</h1></header>
     <div class="results">
         <div id="trophyEl">🏆</div>
         <div class="score-title">Puntuación:</div>
@@ -208,17 +208,17 @@
 <div id="modalHelp" class="modal" onclick="closeModalOnBg(event,'modalHelp')">
     <div class="modal-content" onclick="event.stopPropagation()">
         <div class="modal-header">
-            <h2>Pasos para dividir entre dos cifras</h2>
+            <h2>Pasos para dividir entre tres cifras</h2>
             <button class="modal-close" onclick="closeModal('modalHelp')">&times;</button>
         </div>
         <p><strong>Paso 0. ¿Cuántas cogemos?</strong><br>
-        Cogemos 2 o 3 cifras del dividendo para obtener un número que sea igual o mayor que el divisor.</p>
+        Cogemos 3 o 4 cifras del dividendo para obtener un número que sea igual o mayor que el divisor.</p>
         <p><strong>Paso 1. Tapar y buscar.</strong><br>
-        Como no nos sabemos las tablas de números de dos cifras, tapamos la última cifra del divisor <em>y</em> la última cifra de las que hemos cogido. Con lo que queda, buscamos en la tabla de esa primera cifra un número que se acerque sin pasarse.</p>
+        Tapamos las dos últimas cifras del divisor <em>y</em> las dos últimas de las que hemos cogido. Con lo que queda, buscamos en la tabla de la primera cifra un número que se acerque sin pasarse.</p>
         <p><strong>Paso 2. Multiplicar hasta llegar.</strong><br>
-        Multiplicamos el número del cociente por el divisor y lo restamos al dividendo; primero las <em>unidades</em> y luego las <em>decenas</em>. En cada caso calculamos mentalmente hasta cuánto llega y anotamos la llevada.</p>
+        Multiplicamos el cociente por el divisor y lo restamos al dividendo, de derecha a izquierda: primero las <em>unidades</em>, luego las <em>decenas</em> y luego las <em>centenas</em>. En cada caso calculamos hasta cuánto llega y anotamos la llevada.</p>
         <p><strong>Paso 3. Bajar.</strong><br>
-        Bajamos la siguiente cifra del dividendo para seguir dividiendo. Luego repetimos los pasos 1, 2 y 3 hasta terminar la división.</p>
+        Bajamos la siguiente cifra del dividendo y repetimos los pasos 1, 2 y 3 hasta terminar.</p>
         <p class="highlight-note">Recuerda: cero al cociente → se baja la siguiente cifra sin multiplicar.</p>
     </div>
 </div>
@@ -274,35 +274,37 @@ function closeModalOnBg(e,id){ if(e.target===document.getElementById(id)) closeM
 */
 function calcPaso(partial, divisor) {
     const dStr = divisor.toString();
-    const dU   = parseInt(dStr[1]); // unidades del divisor
-    const dD   = parseInt(dStr[0]); // decenas del divisor
+    const dU   = parseInt(dStr[2]); // unidades del divisor
+    const dD   = parseInt(dStr[1]); // decenas del divisor (1-3)
+    const dC   = parseInt(dStr[0]); // centenas del divisor
     const pStr = partial.toString();
 
-    // Cociente real
     const coc = Math.floor(partial / divisor);
     const restoTotal = partial - coc * divisor;
 
-    // Caso especial: cociente 0 → no hay multiplicación, solo bajar
+    // Cociente 0 → no hay multiplicación, solo bajar
     if (coc === 0) {
-        return { partial, partialStr: pStr, cociente: 0, isZero: true, faltaU: null, faltaD: null, restoTotal, nextDigit: null };
+        return { partial, partialStr: pStr, cociente: 0, isZero: true, faltaU: null, faltaD: null, faltaC: null, restoTotal, nextDigit: null };
     }
 
     // Multiplicar hasta llegar — unidades
-    // coc × dU: calculamos cuánto llega en las unidades del parcial
-    // La operación real: (pU - (coc*dU) mod 10 + 10) mod 10
     const prodU  = coc * dU;
     const pU     = partial % 10;
     const faltaU = ((pU - (prodU % 10)) + 10) % 10;
-    // Llevada: lo que "se lleva" a decenas
-    // prodU + faltaU = pU (en unidades), las decenas que sobran son la llevada
     const carryU = Math.floor((prodU + faltaU) / 10);
 
     // Multiplicar hasta llegar — decenas
     const prodD  = coc * dD + carryU;
     const pD     = Math.floor(partial / 10) % 10;
     const faltaD = ((pD - (prodD % 10)) + 10) % 10;
+    const carryD = Math.floor((prodD + faltaD) / 10);
 
-    return { partial, partialStr: pStr, cociente: coc, isZero: false, faltaU, faltaD, restoTotal, nextDigit: null };
+    // Multiplicar hasta llegar — centenas
+    const prodC  = coc * dC + carryD;
+    const pC     = Math.floor(partial / 100) % 10;
+    const faltaC = ((pC - (prodC % 10)) + 10) % 10;
+
+    return { partial, partialStr: pStr, cociente: coc, isZero: false, faltaU, faltaD, faltaC, restoTotal, nextDigit: null };
 }
 
 function calcAllSteps(dividendStr, divisor) {
@@ -310,7 +312,6 @@ function calcAllSteps(dividendStr, divisor) {
     const steps  = [];
     let pos = 0, partial = 0;
 
-    // Tomar cifras iniciales hasta partial >= divisor
     while (pos < digits.length) {
         partial = partial * 10 + digits[pos]; pos++;
         if (partial >= divisor) break;
@@ -322,32 +323,30 @@ function calcAllSteps(dividendStr, divisor) {
         paso.nextDigit  = nextDigit;
         steps.push(paso);
         if (nextDigit === null) break;
-        // El siguiente parcial = restoTotal × 10 + cifra bajada
         partial = paso.restoTotal * 10 + nextDigit;
         pos++;
-        // Si el nuevo parcial < divisor, el cociente será 0 en el siguiente paso
-        // Eso ya lo maneja calcPaso con isZero:true
     }
     return steps;
 }
 
 function calcMinInt(steps) {
     return 1 + steps.reduce((s, p) => {
-        // cociente siempre (1)
-        // si no es cero: restoU(1) + restoD(1)
-        // bajar si hay nextDigit (1)
-        return s + 1 + (p.isZero ? 0 : 2) + (p.nextDigit !== null ? 1 : 0);
+        // cociente siempre (1); si no es cero: restoU+restoD+restoC (3); bajar si hay (1)
+        return s + 1 + (p.isZero ? 0 : 3) + (p.nextDigit !== null ? 1 : 0);
     }, 0);
 }
 
 function generateRandom() {
     let divisor, dividend;
     do {
-        divisor  = Math.floor(Math.random()*78)+12;  // 12-89
-        const q  = Math.floor(Math.random()*89)+10;  // cociente 10-98
+        const dC = Math.floor(Math.random()*9)+1; // centenas 1-9
+        const dD = Math.floor(Math.random()*3)+1; // decenas 1-3 (control de llevadas)
+        const dU = Math.floor(Math.random()*9)+1; // unidades 1-9
+        divisor  = dC*100 + dD*10 + dU;
+        const q  = Math.floor(Math.random()*89)+10; // cociente 10-98
         const r  = Math.floor(Math.random()*divisor);
         dividend = (q*divisor+r).toString();
-    } while (divisor%10===0 || dividend.length<3);
+    } while (dividend.length < 4);
     return { dividend, divisor };
 }
 
@@ -374,10 +373,12 @@ function startManual() {
     const dsStr=document.getElementById('inpDivisor').value.trim();
     const d=parseInt(dStr), ds=parseInt(dsStr);
     const err=document.getElementById('manualError');
-    if(isNaN(d)||d<100||d>99999){ err.textContent='El dividendo debe estar entre 100 y 99999.'; playSound('error'); return; }
-    if(isNaN(ds)||ds<11||ds>99) { err.textContent='El divisor debe ser de dos cifras (11-99).'; playSound('error'); return; }
-    if(ds%10===0)                { err.textContent='El divisor no puede terminar en 0.'; playSound('error'); return; }
-    if(d<=ds)                    { err.textContent='El dividendo debe ser mayor que el divisor.'; playSound('error'); return; }
+    if(isNaN(d)||d<1000||d>999999){ err.textContent='El dividendo debe estar entre 1000 y 999999.'; playSound('error'); return; }
+    if(isNaN(ds)||ds<111||ds>999) { err.textContent='El divisor debe ser de tres cifras (111-999).'; playSound('error'); return; }
+    if(dsStr.includes('0'))        { err.textContent='El divisor no puede tener ceros.'; playSound('error'); return; }
+    const dMid = parseInt(dsStr[1]);
+    if(dMid<1||dMid>3)             { err.textContent='Para controlar las llevadas, la cifra de las decenas debe ser 1, 2 o 3.'; playSound('error'); return; }
+    if(d<=ds)                      { err.textContent='El dividendo debe ser mayor que el divisor.'; playSound('error'); return; }
     initGame(dStr, ds, false, true, 1);
 }
 
@@ -390,12 +391,13 @@ function initGame(dividend, divisor, isInfinite, isManual, totalQ) {
         questionIndex:0, totalQuestions:totalQ,
         startTime: Date.now(),
         globalMinInt:minInt, globalUserInt:0,
-        // Fases: select_digits → cociente → restoU → restoD → bring_down → siguiente o finished
+        // Fases: select_digits → cociente → restoU → restoD → restoC → bring_down → siguiente o finished
         phase: 'select_digits',
         stepIdx: 0,
         arcTaken: 0,
         cocienteHistory: [],
         restoUConfirmed: [],
+        restoDConfirmed: [],
         feedback: null,
     };
     buildTableModal();
@@ -425,13 +427,15 @@ function renderGuide() {
     const paso = G.steps[G.stepIdx]||{};
     const coc  = paso.cociente;
     const dStr = G.divisor.toString();
-    const dU   = dStr[1];
-    const dD   = dStr[0];
+    const dU   = dStr[2]; // unidades
+    const dD   = dStr[1]; // decenas
+    const dC   = dStr[0]; // centenas
     const guides = {
         select_digits: '0. ¿Cuántas cifras del dividendo cogemos?',
-        cociente:      '1. Tapa la última del divisor y la última del parcial. ¿Cuántas veces cabe?',
-        restoU:        `2a. ${coc} × ${dU} → réstalo a las últimas cifras del parcial. ¿Qué dígito sale?`,
-        restoD:        `2b. ${coc} × ${dD} + llevada → réstalo al resto visible. ¿Qué dígito sale?`,
+        cociente:      '1. Tapa las dos últimas del divisor y las dos últimas del parcial. ¿Cuántas veces cabe?',
+        restoU:        `2a. ${coc} × ${dU} → réstalo a las unidades del parcial. ¿Qué dígito sale?`,
+        restoD:        `2b. ${coc} × ${dD} + llevada → réstalo a las decenas. ¿Qué dígito sale?`,
+        restoC:        `2c. ${coc} × ${dC} + llevada → réstalo a las centenas. ¿Qué dígito sale?`,
         bring_down:    paso.isZero ? 'Cero al cociente. Baja la siguiente cifra del dividendo.' : '3. Baja la siguiente cifra del dividendo.',
         finished:      '¡División completada! Comprueba el resultado.',
     };
@@ -450,12 +454,10 @@ function renderGrid() {
     // Layout de columnas:
     // [1..ddo.length] = dividendo
     // [ddo.length+1]  = línea vertical
-    // [ddo.length+2]  = primera cifra del divisor (decenas)
-    // [ddo.length+3]  = segunda cifra del divisor (unidades)
-    // [ddo.length+2 .. ddo.length+2+qLen-1] = cajas del cociente (empieza bajo divisor)
-    // Total: dividendo + vline + divisor(2) + cociente extra (qLen-2 si qLen>2)
-    const extraCociente = Math.max(0, qLen - 2);
-    const totalCols = ddo.length + 1 + 2 + extraCociente;
+    // [ddo.length+2..ddo.length+4] = divisor (3 cifras)
+    // cociente empieza bajo el divisor (col ddo+2)
+    const extraCociente = Math.max(0, qLen - 3);
+    const totalCols = ddo.length + 1 + 3 + extraCociente;
 
     const wrap = document.createElement('div');
     wrap.className='division-wrapper';
@@ -476,12 +478,13 @@ function renderGrid() {
     // 2. Línea vertical — fila 1
     add('',1,ddo.length+1,'',{borderLeft:'3px solid #1f2937',height:'100%',display:'block'});
 
-    // 3. Divisor — fila 1, columnas ddo+2 y ddo+3
+    // 3. Divisor — fila 1, 3 cifras
     add('digit-box',1,ddo.length+2,dsr[0]);
     add('digit-box',1,ddo.length+3,dsr[1]);
+    add('digit-box',1,ddo.length+4,dsr[2]);
 
-    // 4. Línea horizontal — fila 2, desde vline hasta fin
-    add('',2,`${ddo.length+1} / span ${1+2+extraCociente}`,'',{borderTop:'3px solid #1f2937',height:'0',display:'block'});
+    // 4. Línea horizontal — fila 2
+    add('',2,`${ddo.length+1} / span ${1+3+extraCociente}`,'',{borderTop:'3px solid #1f2937',height:'0',display:'block'});
 
     // 5. Cajas cociente — fila 3, empezando bajo divisor (col ddo+2)
     steps.forEach((paso, idx) => {
@@ -494,7 +497,7 @@ function renderGrid() {
         add(cls, 3, col, content);
     });
 
-    // 6. Arco — aparece DESPUÉS de confirmar cuántas cifras, y se queda fijo
+    // 6. Arco — fijo tras confirmar cuántas cifras
     if(G.arcTaken > 0) {
         const ah=document.createElement('div');
         ah.style.cssText=`grid-row:1;grid-column:1 / span ${G.arcTaken};position:relative;height:0;`;
@@ -503,8 +506,7 @@ function renderGrid() {
         ah.appendChild(arc); wrap.appendChild(ah);
     }
 
-    // 7. Filas de restos (modelo del cuaderno escolar).
-    // El parcial del paso i vive en una fila. Cociente >=1 baja una fila; cociente 0 no.
+    // 7. Restos (modelo del cuaderno escolar).
     const arcTaken = G.arcTaken || steps[0].partialStr.length;
 
     const filaParcial = [];
@@ -520,25 +522,30 @@ function renderGrid() {
         const restoRow = (i+1 < steps.length) ? filaParcial[i+1] : filaParcial[i] + 1;
 
         const showFull = i<G.stepIdx || (isCur&&(G.phase==='bring_down'||G.phase==='finished'));
-        const showU    = isCur && G.phase==='restoD' && G.restoUConfirmed && G.restoUConfirmed[i]!==undefined;
 
         if(showFull) {
-            // Cociente 0: NO se escribe resto, solo baja la cifra (se pega al parcial)
+            // Cociente 0: NO se escribe resto, solo se baja la cifra
             if(!paso.isZero) {
-                const restoStr = paso.faltaD.toString() + paso.faltaU.toString();
+                const restoStr = paso.faltaC.toString() + paso.faltaD.toString() + paso.faltaU.toString();
                 const startCol = endCol - restoStr.length + 1;
                 for(let k=0;k<restoStr.length;k++) {
                     add('digit-box resto-col', restoRow, startCol+k, restoStr[k]);
                 }
             }
-            // Cifra bajada en la fila del parcial siguiente
             if(paso.nextDigit!==null && (i<G.stepIdx || (isCur&&G.phase==='finished'))) {
                 const bajaRow = filaParcial[i+1] !== undefined ? filaParcial[i+1] : restoRow;
                 add('digit-box', bajaRow, endCol+1, paso.nextDigit.toString());
             }
-        } else if(showU) {
-            // Dígito de unidades confirmado: va en la fila del resto de este paso
-            add('digit-box resto-col', restoRow, endCol, G.restoUConfirmed[i].toString());
+        } else if(isCur) {
+            // Dígitos del resto confirmados progresivamente, en la fila del resto de este paso
+            if(G.phase==='restoD' && G.restoUConfirmed && G.restoUConfirmed[i]!==undefined) {
+                add('digit-box resto-col', restoRow, endCol, G.restoUConfirmed[i].toString());
+            } else if(G.phase==='restoC') {
+                if(G.restoDConfirmed && G.restoDConfirmed[i]!==undefined)
+                    add('digit-box resto-col', restoRow, endCol-1, G.restoDConfirmed[i].toString());
+                if(G.restoUConfirmed && G.restoUConfirmed[i]!==undefined)
+                    add('digit-box resto-col', restoRow, endCol, G.restoUConfirmed[i].toString());
+            }
         }
     }
 }
@@ -554,7 +561,7 @@ function renderInteract() {
         popup.style.display='block';
         document.getElementById('questionText').textContent='¿Cuántas cifras cogemos del dividendo?';
         const opts=document.getElementById('questionOptions'); opts.innerHTML='';
-        [2,3].forEach(n=>{
+        [3,4].forEach(n=>{
             if(n>G.dividend.length) return;
             const b=document.createElement('button'); b.className='digit-btn'; b.textContent=n;
             b.onclick=()=>handleSelectDigits(n); opts.appendChild(b);
@@ -638,8 +645,17 @@ function handleDigit(d) {
         } else { playSound('error'); }
 
     } else if(G.phase==='restoD') {
-        // faltaD puede ser 0 — siempre se acepta el dígito correcto incluido el 0
+        // faltaD puede ser 0
         if(d===paso.faltaD) {
+            playSound('correct');
+            if(!G.restoDConfirmed) G.restoDConfirmed=[];
+            G.restoDConfirmed[G.stepIdx]=d;
+            G.phase='restoC';
+        } else { playSound('error'); }
+
+    } else if(G.phase==='restoC') {
+        // faltaC puede ser 0
+        if(d===paso.faltaC) {
             playSound('correct');
             if(paso.nextDigit!==null) G.phase='bring_down';
             else                      G.phase='finished';
@@ -669,7 +685,7 @@ function handleNext() {
     const steps=calcAllSteps(dividend,divisor);
     G.globalMinInt+=calcMinInt(steps);
     G.questionIndex++;
-    Object.assign(G,{dividend,divisor,steps,phase:'select_digits',stepIdx:0,arcTaken:0,cocienteHistory:[],restoUConfirmed:[],feedback:null});
+    Object.assign(G,{dividend,divisor,steps,phase:'select_digits',stepIdx:0,arcTaken:0,cocienteHistory:[],restoUConfirmed:[],restoDConfirmed:[],feedback:null});
     buildTableModal(); renderGame();
 }
 
@@ -690,33 +706,34 @@ function mkBtn(label,cls,fn){const b=document.createElement('button');b.classNam
 
 function buildTableModal() {
     const dStr = G.divisor.toString();
-    const dD   = parseInt(dStr[0]); // decenas
-    const dU   = parseInt(dStr[1]); // unidades
+    const dC   = parseInt(dStr[0]); // centenas
+    const dD   = parseInt(dStr[1]); // decenas
+    const dU   = parseInt(dStr[2]); // unidades
     document.getElementById('tableTitle').textContent = `Tablas del divisor ${G.divisor}`;
     const c = document.getElementById('tableContent');
     c.innerHTML = '';
 
-    // Dos columnas: tabla de decenas y tabla de unidades
     const wrap = document.createElement('div');
-    wrap.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:16px;';
+    wrap.style.cssText = 'display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;';
 
     const makeTable = (digit, label) => {
         const col = document.createElement('div');
         const title = document.createElement('p');
-        title.style.cssText = 'font-weight:800;color:var(--blue-dark);margin-bottom:8px;text-align:center;font-size:1em;';
+        title.style.cssText = 'font-weight:800;color:var(--blue-dark);margin-bottom:8px;text-align:center;font-size:.82em;';
         title.textContent = label;
         col.appendChild(title);
         for(let n=1;n<=10;n++) {
             const p = document.createElement('p');
-            p.style.cssText = 'font-family:Courier New,monospace;font-size:.92em;margin-bottom:5px;';
-            p.textContent = `${digit} × ${n} = ${digit*n}`;
+            p.style.cssText = 'font-family:Courier New,monospace;font-size:.8em;margin-bottom:5px;text-align:center;';
+            p.textContent = `${digit}×${n}=${digit*n}`;
             col.appendChild(p);
         }
         return col;
     };
 
-    wrap.appendChild(makeTable(dD, `Tabla del ${dD} (decenas)`));
-    wrap.appendChild(makeTable(dU, `Tabla del ${dU} (unidades)`));
+    wrap.appendChild(makeTable(dC, `${dC} (cent.)`));
+    wrap.appendChild(makeTable(dD, `${dD} (dec.)`));
+    wrap.appendChild(makeTable(dU, `${dU} (unid.)`));
     c.appendChild(wrap);
 }
 
